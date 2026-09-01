@@ -8,21 +8,6 @@ struct SquareMatrix<const N: usize> {
     matrix: [[i64; N]; N],
 }
 
-impl<const N: usize> fmt::Display for SquareMatrix<N> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        for i in 0..N {
-            let line: Vec<String> = self.matrix[i]
-                .iter()
-                .map(|element| element.to_string())
-                .collect();
-            if let Result::Err(err) = writeln!(f, "{}", line.join(" ")) {
-                return Result::Err(err);
-            }
-        }
-        Ok(())
-    }
-}
-
 impl<const N: usize> From<[[i64; N]; N]> for SquareMatrix<N> {
     fn from(item: [[i64; N]; N]) -> Self {
         Self { matrix: item }
@@ -57,10 +42,26 @@ impl<const N: usize> Mul for SquareMatrix<N> {
     }
 }
 
+// Bonus if you want to implement the `Display` trait.
+impl<const N: usize> fmt::Display for SquareMatrix<N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        for i in 0..N {
+            let line: Vec<String> = self.matrix[i]
+                .iter()
+                .map(|element| element.to_string())
+                .collect();
+            if let Result::Err(err) = writeln!(f, "{}", line.join(" ")) {
+                return Result::Err(err);
+            }
+        }
+        Ok(())
+    }
+}
+
 pub fn main() {
     let m1 = SquareMatrix::from([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
     let m2 = SquareMatrix::from([[1, 0, 0], [0, -1, 0], [0, 0, -1]]);
-    println!("{}", m1 + m2);
-    println!("{}", m2 * m2);
-    println!("{}", m1 + m2 * m2);
+    println!("{:?}", m1 + m2);
+    println!("{:?}", m2 * m2);
+    println!("{:?}", m1 + m2 * m2);
 }
