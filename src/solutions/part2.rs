@@ -1,75 +1,72 @@
-use std::{
-    cmp::{Ord, Ordering, PartialOrd},
-    collections::BinaryHeap,
-};
-
-#[derive(Eq, PartialEq)]
-struct Item {
-    cost: u64,
-    node: usize,
+enum Op {
+    Add,
+    Sub,
+    Mul,
+    Div,
 }
 
-impl Ord for Item {
-    fn cmp(&self, other: &Self) -> Ordering {
-        other.cost.cmp(&self.cost)
+enum TreeNode<'a> {
+    Leaf(i32),
+    Expr {
+        op: Op,
+        left: &'a TreeNode<'a>,
+        right: &'a TreeNode<'a>,
+    },
+}
+
+fn evaluate(tree: &TreeNode) -> i32 {
+    match *tree {
+        TreeNode::Leaf(ref num) => *num,
+        TreeNode::Expr {
+            op: Op::Add,
+            ref left,
+            ref right,
+        } => evaluate(left) + evaluate(right),
+        TreeNode::Expr {
+            op: Op::Sub,
+            ref left,
+            ref right,
+        } => evaluate(left) - evaluate(right),
+        TreeNode::Expr {
+            op: Op::Mul,
+            ref left,
+            ref right,
+        } => evaluate(left) * evaluate(right),
+        TreeNode::Expr {
+            op: Op::Div,
+            ref left,
+            ref right,
+        } => evaluate(left) / evaluate(right),
     }
-}
-
-impl PartialOrd for Item {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-fn sssp(graph: &Vec<Vec<(usize, u64)>>, source: usize) -> Vec<u64> {
-    let mut dist = vec![u64::MAX; graph.len()];
-    dist[source] = 0;
-
-    let start = Item {
-        cost: 0,
-        node: source,
-    };
-    let mut open = BinaryHeap::from([start]);
-
-    while let Some(Item { cost, node: u }) = open.pop() {
-        for &(v, w) in &graph[u] {
-            let cost = cost + w;
-            if cost < dist[v] {
-                dist[v] = cost;
-                open.push(Item { cost, node: v });
-            }
-        }
-    }
-
-    dist
-}
-
-fn get_integer_line() -> Vec<u64> {
-    let mut buffer: String = Default::default();
-    let _ = std::io::stdin().read_line(&mut buffer);
-    buffer
-        .split_whitespace()
-        .filter_map(|num| num.parse::<u64>().ok())
-        .collect()
 }
 
 pub fn main() {
-    let first_line = get_integer_line();
-    let (n, m) = (first_line[0] as usize, first_line[1] as usize);
+    let leaf_120 = TreeNode::Leaf(120);
+    let leaf_2 = TreeNode::Leaf(2);
+    let leaf_3 = TreeNode::Leaf(3);
+    let leaf_5 = TreeNode::Leaf(5);
+    let leaf_8 = TreeNode::Leaf(8);
 
-    let mut graph = vec![vec![]; n];
-    (0..m)
-        .flat_map(|_| {
-            let line = get_integer_line();
-            [(line[0], (line[1], line[2])), (line[1], (line[0], line[2]))]
-        })
-        .for_each(|(u, (v, cost))| {
-            graph[u as usize].push((v as usize, cost));
-        });
+    let t1 = TreeNode::Expr {
+        op: Op::Div,
+        left: &leaf_120,
+        right: &leaf_2,
+    };
+    let t2 = TreeNode::Expr {
+        op: Op::Mul,
+        left: &leaf_3,
+        right: &leaf_5,
+    };
+    let t3 = TreeNode::Expr {
+        op: Op::Sub,
+        left: &t2,
+        right: &leaf_8,
+    };
 
-    let answer = sssp(&graph, 0);
-
-    for (i, distance) in answer.into_iter().enumerate() {
-        println!("Node {i}, Shortest Distance: {distance}.");
-    }
+    let tree = TreeNode::Expr {
+        op: Op::Add,
+        left: &t1,
+        right: &t3,
+    };
+    println!("{}", evaluate(&tree));
 }

@@ -1,67 +1,75 @@
 use std::{
-    fmt,
-    ops::{Add, Mul},
+    cmp::{Ord, Ordering, PartialOrd},
+    collections::BinaryHeap,
 };
 
-#[derive(Clone, Copy, Debug)]
-struct SquareMatrix<const N: usize> {
-    matrix: [[i64; N]; N],
+#[derive(Eq, PartialEq)]
+struct Item {
+    cost: u64,
+    node: usize,
 }
 
-impl<const N: usize> From<[[i64; N]; N]> for SquareMatrix<N> {
-    fn from(item: [[i64; N]; N]) -> Self {
-        Self { matrix: item }
+impl Ord for Item {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.cost.cmp(&self.cost)
     }
 }
 
-impl<const N: usize> Add for SquareMatrix<N> {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self::Output {
-        Self {
-            matrix: std::array::from_fn(|i| {
-                std::array::from_fn(|j| self.matrix[i][j] + other.matrix[i][j])
-            }),
-        }
+impl PartialOrd for Item {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
-impl<const N: usize> Mul for SquareMatrix<N> {
-    type Output = Self;
+fn sssp(graph: &Vec<Vec<(usize, u64)>>, source: usize) -> Vec<u64> {
+    let mut dist = vec![u64::MAX; graph.len()];
+    dist[source] = 0;
 
-    fn mul(self, other: Self) -> Self::Output {
-        Self {
-            matrix: std::array::from_fn(|i| {
-                std::array::from_fn(|j| {
-                    (0..N)
-                        .map(|k| self.matrix[i][k] * other.matrix[k][j])
-                        .sum::<i64>()
-                })
-            }),
-        }
-    }
-}
+    let start = Item {
+        cost: 0,
+        node: source,
+    };
+    let mut open = BinaryHeap::from([start]);
 
-// Bonus if you want to implement the `Display` trait.
-impl<const N: usize> fmt::Display for SquareMatrix<N> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        for i in 0..N {
-            let line: Vec<String> = self.matrix[i]
-                .iter()
-                .map(|element| element.to_string())
-                .collect();
-            if let Result::Err(err) = writeln!(f, "{}", line.join(" ")) {
-                return Result::Err(err);
+    while let Some(Item { cost, node: u }) = open.pop() {
+        for &(v, w) in &graph[u] {
+            let cost = cost + w;
+            if cost < dist[v] {
+                dist[v] = cost;
+                open.push(Item { cost, node: v });
             }
         }
-        Ok(())
     }
+
+    dist
+}
+
+fn get_integer_line() -> Vec<u64> {
+    let mut buffer: String = Default::default();
+    let _ = std::io::stdin().read_line(&mut buffer);
+    buffer
+        .split_whitespace()
+        .filter_map(|num| num.parse::<u64>().ok())
+        .collect()
 }
 
 pub fn main() {
-    let m1 = SquareMatrix::from([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
-    let m2 = SquareMatrix::from([[1, 0, 0], [0, -1, 0], [0, 0, -1]]);
-    println!("{:?}", m1 + m2);
-    println!("{:?}", m2 * m2);
-    println!("{:?}", m1 + m2 * m2);
+    let first_line = get_integer_line();
+    let (n, m) = (first_line[0] as usize, first_line[1] as usize);
+
+    let mut graph = vec![vec![]; n];
+    (0..m)
+        .flat_map(|_| {
+            let line = get_integer_line();
+            [(line[0], (line[1], line[2])), (line[1], (line[0], line[2]))]
+        })
+        .for_each(|(u, (v, cost))| {
+            graph[u as usize].push((v as usize, cost));
+        });
+
+    let answer = sssp(&graph, 0);
+
+    for (i, distance) in answer.into_iter().enumerate() {
+        println!("Node {i}, Shortest Distance: {distance}.");
+    }
 }

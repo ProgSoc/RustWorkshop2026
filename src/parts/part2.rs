@@ -1,85 +1,44 @@
-// TODO: Implement the required traits for `Item`.
-// You can use the derive macro to automatically implement Eq and PartialEq.
-// You will have to implement Ord and PartialOrd yourself,
-// because the default implementation will rank `Item` based on `cost`
-// (making a binary heap behave as a max heap), but we need a min heap instead.
-//
-// Hint: Given two Items `self` and `other`, you can implement the default Ord
-// implementation by using `self.cost.cmp(&other.cost)` in your custom `cmp()` method.
-// All you need to do is reverse this logic.
-// Then, for PartialOrd, everything is a total order, so you can always
-// return a `Some` enum variant containing your `cmp()` result from the Ord implementation.
-struct Item {
-    cost: u64,
-    node: usize,
+// Start by uncommenting this,
+// which will be used to represent operators in the expression.
+/*
+enum Op {
+    Add,
+    Sub,
+    Mul,
+    Div,
+}
+*/
+
+// TODO:
+// Make a enum `TreeNode` that can be a leaf (Leaf) or an expression (Expr).
+// If it's a Leaf, it will contain one integer (i32).
+// If it's an Expr, it will contain an operation (Op) and two sub-expressions (TreeNode).
+// Start by uncommenting the block below.
+
+/*
+enum TreeNode {
+    // Complete this!
 }
 
-fn sssp(graph: &Vec<Vec<(usize, u64)>>, source: usize) -> Vec<u64> {
-    let mut dist = vec![u64::MAX; graph.len()];
-
-    let start = Item {
-        cost: 0,
-        node: source,
-    };
-    dist[start.node] = start.cost;
-
-    // TODO: Implement Dijkstra's.
-
-    // Start with initialising a binary heap with a single element (`start`, as per above).
-    // Loop while the binary heap is not empty:
-    //   Loop through every element in `graph[u]`, destructing it into `(v, w)`:
-    //     Calculate the new cost (`cost + w`).
-    //     If this new cost is less (better) than the existing answer (`dist[v]`),
-    //     then we want to explore this path further, such that:
-    //       We update our answer (`dist[v]`) to now contain our new cost,
-    //       and we add a new item with this cost and node to our traversal frontier (binary heap).
-
-    // Your code will have the following structure (fill in the TODO):
-    /*
-    let mut open = TODO;
-    while let TODO {
-        for &(TODO) in &graph[u] {
-            let new_cost = TODO;
-            if TODO {
-                TODO = new_cost;
-                open.push(TODO);
-            }
-        }
-    }
-    */
-
-
-    dist
+fn evaluate(tree: &TreeNode) -> i32 {
+    // Complete this as well!
 }
-
-// This function is already implemented to grab a list of space-separated integers from user input.
-fn get_integer_line() -> Vec<u64> {
-    let mut buffer: String = Default::default();
-    let _ = std::io::stdin().read_line(&mut buffer);
-    buffer
-        .split_whitespace()
-        .filter_map(|num| num.parse::<u64>().ok())
-        .collect()
-}
+*/
 
 pub fn main() {
-    let first_line = get_integer_line();
-    let (n, m) = (first_line[0] as usize, first_line[1] as usize);
+    // Uncomment below when you are ready.
+    /*
+    let leaf_120 = TreeNode::Leaf(120);
+    let leaf_2 = TreeNode::Leaf(2);
+    let leaf_3 = TreeNode::Leaf(3);
+    let leaf_5 = TreeNode::Leaf(5);
+    let leaf_8 = TreeNode::Leaf(8);
 
-    // TODO: To challenge yourself, change the for loop to an implementation just using iterator methods.
-    let mut graph = vec![vec![]; n];
-    for _ in 0..m {
-        let line = get_integer_line();
-        let u = line[0] as usize;
-        let v = line[1] as usize;
-        let cost = line[2];
+    let t1 = TreeNode::Expr { op: Op::Div, left: &leaf_120, right: &leaf_2 };
+    let t2 = TreeNode::Expr { op: Op::Mul, left: &leaf_3, right: &leaf_5 };
+    let t3 = TreeNode::Expr { op: Op::Sub, left: &t2, right: &leaf_8 };
 
-        graph[u].push((v, cost));
-        graph[v].push((u, cost));
-    }
-
-    let answer = sssp(&graph, 0);
-    for (i, distance) in answer.into_iter().enumerate() {
-        println!("Node {i}, Shortest Distance: {distance}.");
-    }
+    let tree = TreeNode::Expr { op: Op::Add, left: &t1, right: &t3 };
+    println!("{}", evaluate(&tree));
+    */
 }

@@ -44,7 +44,7 @@ Finally, to execute the code, run `cargo run --release` in the root folder
 As per **Option 2**, the Rust package that this repository contains is capable of running as-is.
 
 To test out different parts of the workshop code, change the `part` variable to see different snapshots
-of the content in action. Keep it an integer from 1 to 3 though.
+of the content in action. Keep it an integer from 1 to 4 though.
 
 You can even check your own implemented output against the workshop solution code by
 toggling the `use_solution` boolean variable. If `true`, the workshop solution code will be used.

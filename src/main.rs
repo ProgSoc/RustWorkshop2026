@@ -27,6 +27,13 @@ fn main() {
                 parts::part3::main()
             }
         }
-        _ => println!("Please ensure `part` is an integer from 1 to 3."),
+        4 => {
+            if use_solution {
+                solutions::part4::main()
+            } else {
+                parts::part4::main()
+            }
+        }
+        _ => println!("Please ensure `part` is an integer from 1 to 4."),
     }
 }
